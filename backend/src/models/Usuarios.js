@@ -1,5 +1,6 @@
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/database-sequelize');
+const bcrypt = require('bcryptjs');
 
 const Usuario = sequelize.define('Usuario', {
   id: {
@@ -38,13 +39,15 @@ const Usuario = sequelize.define('Usuario', {
     type: DataTypes.STRING(20),
     allowNull: true
   },
-  token: {
+  token_verificacion: {
     type: DataTypes.TEXT,
-    allowNull: true
+    allowNull: true,
+    comment: 'Token para verificación de email y recuperación de contraseña'
   },
-  token_expiracion: {
+  verificacion_expiracion: {
     type: DataTypes.DATE,
-    allowNull: true
+    allowNull: true,
+    comment: 'Expiración del token de verificación (24h)'
   },
   estado: {
     type: DataTypes.ENUM('activo', 'inactivo', 'pendiente_verificacion'),

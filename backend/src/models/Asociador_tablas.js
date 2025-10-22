@@ -1,14 +1,14 @@
 const { sequelize } = require('../config/database-sequelize');
 
 // Importar todos los modelos
-const Usuario = require('./Usuario');
-const Rol = require('./Rol');
-const Estacionamiento = require('./Estacionamiento');
-const Lugar = require('./Lugar');
-const Reserva = require('./Reserva');
-const Pago = require('./Pago');
-const Ocupacion = require('./Ocupacion');
-const Vehiculo = require('./Vehiculo');
+const Usuario = require('./Usuarios');
+const Rol = require('./Roles');
+const Estacionamiento = require('./Estacionamientos');
+const Lugar = require('./Lugares');
+const Reserva = require('./Reservas');
+const Pago = require('./Pagos');
+const Ocupacion = require('./Ocupaciones');
+const Vehiculo = require('./Vehiculos');
 
 // ============================================
 // DEFINIR TODAS LAS ASOCIACIONES

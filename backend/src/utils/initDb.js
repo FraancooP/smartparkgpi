@@ -1,10 +1,13 @@
 require('dotenv').config();
-const { testConnection, syncModels } = require('../config/database-sequelize');
+const { testConnection, syncModels, createDatabaseIfNotExists } = require('../config/database-sequelize');
 const { Administrador } = require('../models');
 
 const initializeDatabase = async () => {
   try {
     console.log('🔄 Inicializando base de datos...');
+    
+    // Crear la base de datos si no existe
+    await createDatabaseIfNotExists();
     
     // Probar conexión
     const connected = await testConnection();

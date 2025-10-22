@@ -235,12 +235,65 @@ const formData = ref({
   confirmPassword: ''
 })
 
-const handleSubmit = () => {
+const handleSubmit = async () => {
+  // 1. Validar contraseñas
   if (formData.value.password !== formData.value.confirmPassword) {
     alert('Las contraseñas no coinciden')
     return
   }
-  console.log('Client register:', formData.value)
-  // Aquí se conectará con el backend
+
+  try {
+    // 2. Hacer la petición HTTP al backend
+    const response = await fetch('http://localhost:4000/api/auth/register-client', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        nombre: formData.value.firstName,
+        apellido: formData.value.lastName,
+        nombre_usuario: formData.value.username,
+        correo: formData.value.email,
+        contrasena: formData.value.password,
+        telefono: formData.value.phone,
+        dni: formData.value.dni
+      })
+    })
+
+    // 3. Procesar la respuesta
+    const data = await response.json()
+
+    if (response.ok) {
+      // Verificar si se agregó un nuevo rol a una cuenta existente
+      if (data.rolAgregado && data.rolesExistentes.length > 0) {
+        alert(`🎉 ¡Cuenta Detectada!
+
+Hemos detectado que tus credenciales ya están registradas como: ${data.rolesExistentes.join(' y ')}.
+
+✅ Se ha agregado el rol de Usuario/Cliente a tu cuenta.
+
+📧 Revisa tu email para activar este nuevo rol.
+
+🔑 Tus credenciales son las mismas, solo debes verificar tu email y luego iniciar sesión como Usuario/Cliente.`)
+      } else {
+        // Registro nuevo
+        alert(`✅ ¡Cuenta creada exitosamente!
+
+📧 Hemos enviado un email de verificación a ${formData.value.email}
+
+Por favor, revisa tu bandeja de entrada (y spam) y haz clic en el enlace para activar tu cuenta.`)
+      }
+      
+      // Redirigir al login
+      this.$emit('login')
+    } else {
+      // ❌ ERROR del servidor
+      alert(data.error || 'Error al registrar usuario')
+    }
+  } catch (error) {
+    // ❌ ERROR de conexión
+    console.error('Error:', error)
+    alert('No se pudo conectar con el servidor')
+  }
 }
 </script>

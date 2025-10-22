@@ -159,8 +159,43 @@ const formData = ref({
   password: ''
 })
 
-const handleSubmit = () => {
-  console.log('Client login:', formData.value)
-  // Aquí se conectará con el backend
+const handleSubmit = async () => {
+  try {
+    // 1. Hacer la petición HTTP al backend
+    const response = await fetch('http://localhost:4000/api/auth/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        usuario: formData.value.username, // Campo esperado por el backend
+        contrasena: formData.value.password // Campo esperado por el backend
+      })
+    })
+
+    // 2. Procesar la respuesta
+    const data = await response.json()
+
+    if (response.ok) {
+      //ÉXITO - Login exitoso
+      
+      // Guardar el token JWT en localStorage
+      localStorage.setItem('token', data.token)
+      localStorage.setItem('user', JSON.stringify(data.usuario))
+      
+      alert(`¡Bienvenido ${data.usuario.nombre}!`)
+      
+      // Redirigir al dashboard del usuario
+      // this.$router.push('/dashboard')
+      
+    } else {
+      // ERROR del servidor
+      alert(data.error || 'Credenciales incorrectas')
+    }
+  } catch (error) {
+    // ERROR de conexión
+    console.error('Error:', error)
+    alert('No se pudo conectar con el servidor')
+  }
 }
 </script>

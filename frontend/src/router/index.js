@@ -3,6 +3,7 @@ import HomeView from '@/views/HomeView.vue'
 import AdminLoginView from '@/views/AdminLoginView.vue'
 import AdminRegisterView from '@/views/AdminRegisterView.vue'
 import AdminForgotPasswordView from '@/views/AdminForgotPasswordView.vue'
+import AdminDashboardView from '@/views/AdminDashboardView.vue'
 import ClientLoginView from '@/views/ClientLoginView.vue'
 import ClientRegisterView from '@/views/ClientRegisterView.vue'
 import ClientForgotPasswordView from '@/views/ClientForgotPasswordView.vue'
@@ -31,6 +32,12 @@ const router = createRouter({
       component: AdminForgotPasswordView
     },
     {
+      path: '/admin/dashboard',
+      name: 'admin-dashboard',
+      component: AdminDashboardView,
+      meta: { requiresAuth: true, role: 'admin' }
+    },
+    {
       path: '/client/login',
       name: 'client-login',
       component: ClientLoginView
@@ -44,6 +51,11 @@ const router = createRouter({
       path: '/client/forgot-password',
       name: 'client-forgot-password',
       component: ClientForgotPasswordView
+    },
+    {
+      path: '/verify-email',
+      name: 'VerifyEmail',
+      component: () => import('../views/VerifyEmailView.vue')
     }
   ]
 })
