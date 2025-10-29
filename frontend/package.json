@@ -9,11 +9,14 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-free": "^7.1.0",
+    "chart.js": "^4.5.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-vue-next": "^0.545.0",
     "tailwind-merge": "^3.3.1",
     "vue": "^3.5.22",
+    "vue-chartjs": "^5.3.2",
     "vue-router": "^4.6.0"
   },
   "devDependencies": {

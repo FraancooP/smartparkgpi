@@ -8,8 +8,8 @@
       </div>
 
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <!-- Notificaciones -->
-        <Card class="shadow-xl border-0 bg-white">
+  <!-- Notificaciones -->
+  <Card class="shadow-xl border-0 bg-white text-slate-800">
           <CardHeader class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-t-lg">
             <div class="flex items-center gap-3">
               <Bell class="w-6 h-6" />
@@ -53,8 +53,8 @@
           </CardContent>
         </Card>
 
-        <!-- Seguridad -->
-        <Card class="shadow-xl border-0 bg-white">
+  <!-- Seguridad -->
+  <Card class="shadow-xl border-0 bg-white text-slate-800">
           <CardHeader class="bg-gradient-to-r from-green-600 to-teal-600 text-white rounded-t-lg">
             <div class="flex items-center gap-3">
               <Shield class="w-6 h-6" />
@@ -96,8 +96,8 @@
           </CardContent>
         </Card>
 
-        <!-- Apariencia -->
-        <Card class="shadow-xl border-0 bg-white">
+  <!-- Apariencia -->
+  <Card class="shadow-xl border-0 bg-white text-slate-800">
           <CardHeader class="bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-t-lg">
             <div class="flex items-center gap-3">
               <Palette class="w-6 h-6" />
@@ -135,8 +135,8 @@
           </CardContent>
         </Card>
 
-        <!-- Sistema -->
-        <Card class="shadow-xl border-0 bg-white">
+  <!-- Sistema -->
+  <Card class="shadow-xl border-0 bg-white text-slate-800">
           <CardHeader class="bg-gradient-to-r from-indigo-600 to-blue-600 text-white rounded-t-lg">
             <div class="flex items-center gap-3">
               <Globe class="w-6 h-6" />
@@ -175,8 +175,8 @@
         </Card>
       </div>
 
-      <!-- Sección de Datos y Respaldo -->
-      <Card class="shadow-xl border-0 bg-white">
+  <!-- Sección de Datos y Respaldo -->
+  <Card class="shadow-xl border-0 bg-white text-slate-800">
         <CardHeader>
           <div class="flex items-center gap-3 text-slate-800">
             <Download class="w-6 h-6" />
@@ -210,8 +210,8 @@
         </CardContent>
       </Card>
 
-      <!-- Zona Peligrosa -->
-      <Card class="shadow-xl border-2 border-red-200 bg-white">
+  <!-- Zona Peligrosa -->
+  <Card class="shadow-xl border-2 border-red-200 bg-white text-slate-800">
         <CardHeader class="bg-gradient-to-r from-red-500 to-red-600 text-white rounded-t-lg">
           <div class="flex items-center gap-3">
             <AlertTriangle class="w-6 h-6" />

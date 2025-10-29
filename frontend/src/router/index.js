@@ -35,7 +35,33 @@ const router = createRouter({
       path: '/admin/dashboard',
       name: 'admin-dashboard',
       component: AdminDashboardView,
-      meta: { requiresAuth: true, role: 'admin' }
+      meta: { requiresAuth: true, role: 'admin' },
+      children: [
+        {
+          path: 'parking/:id',
+          name: 'parking-detail',
+          component: () => import('../components/admin/ParkingDetailView.vue'),
+          meta: { requiresAuth: true, role: 'admin' }
+        },
+        {
+          path: 'profile',
+          name: 'admin-profile',
+          component: () => import('@/components/admin/ProfileView.vue'),
+          meta: { requiresAuth: true, role: 'admin' }
+        },
+        {
+          path: 'settings',
+          name: 'admin-settings',
+          component: () => import('@/components/admin/SettingsView.vue'),
+          meta: { requiresAuth: true, role: 'admin' }
+        },
+        {
+          path: 'register-parking',
+          name: 'register-parking',
+          component: () => import('@/components/admin/ParkingRegistrationForm.vue'),
+          meta: { requiresAuth: true, role: 'admin' }
+        }
+      ]
     },
     {
       path: '/client/login',

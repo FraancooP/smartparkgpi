@@ -1,14 +1,15 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-blue-50 via-green-50 to-blue-50">
-    <div class="max-w-7xl mx-auto p-8 space-y-8">
-      <!-- Botón de Registro -->
-      <div class="flex justify-center">
+  <div class="min-h-screen bg-[hsl(var(--background))]">
+    <div class="max-w-7xl mx-auto px-6 py-8 space-y-6">
+      <!-- Header with register button -->
+      <div class="flex justify-between items-center">
+        <h1 class="text-2xl font-semibold text-gray-900">Panel de Control</h1>
         <Button
           @click="$emit('register-click')"
-          class="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white px-8 py-6 text-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105"
+          class="bg-[hsl(var(--primary))] hover:bg-[hsl(var(--primary)_/_0.9)] text-white px-4 py-2 rounded-lg flex items-center gap-2"
         >
-          <Plus class="w-6 h-6 mr-3" />
-          Registrar un Estacionamiento
+          <Plus class="w-5 h-5" />
+          Registrar Estacionamiento
         </Button>
       </div>
 
@@ -43,7 +44,7 @@
           v-for="parking in parkings"
           :key="parking.id"
           :parking="parking"
-          @click="$emit('parking-click', parking)"
+          @click="handleParkingClick(parking)"
         />
       </div>
 
@@ -74,9 +75,12 @@
 
 <script setup>
 import { computed } from 'vue'
+import { useRouter } from 'vue-router'
 import { Plus } from 'lucide-vue-next'
 import Button from '@/components/ui/Button.vue'
 import ParkingCard from './ParkingCard.vue'
+
+const router = useRouter()
 
 const props = defineProps({
   parkings: {
@@ -85,7 +89,11 @@ const props = defineProps({
   }
 })
 
-defineEmits(['register-click', 'parking-click'])
+defineEmits(['register-click'])
+
+const handleParkingClick = (parking) => {
+  router.push(`/admin/dashboard/parking/${parking.id}`)
+}
 
 const totalSpaces = computed(() => 
   props.parkings.reduce((total, parking) => total + parking.spaces, 0)

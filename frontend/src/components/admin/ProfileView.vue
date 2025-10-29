@@ -9,70 +9,70 @@
 
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <!-- Información del Usuario -->
-        <Card class="lg:col-span-2 shadow-xl border-0 bg-white">
+        <Card class="lg:col-span-2 shadow-xl border-0 bg-white text-black">
           <CardHeader class="bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-t-lg">
             <div class="flex items-center gap-3">
               <User class="w-6 h-6" />
               <h2 class="text-xl font-bold">Información Personal</h2>
             </div>
           </CardHeader>
-          <CardContent class="p-8 space-y-6">
+          <CardContent class="p-8 space-y-6 text-black">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div class="space-y-2">
-                <Label for="firstName">Nombre</Label>
+                <Label for="firstName" class="text-black">Nombre</Label>
                 <Input
                   id="firstName"
                   :value="userInfo.nombre"
-                  class="border-purple-200 focus:border-purple-400"
+                  class="border-purple-200 focus:border-purple-400 text-black"
                   readonly
                 />
               </div>
               <div class="space-y-2">
-                <Label for="lastName">Apellido</Label>
+                <Label for="lastName" class="text-black">Apellido</Label>
                 <Input
                   id="lastName"
                   :value="userInfo.apellido"
-                  class="border-purple-200 focus:border-purple-400"
+                  class="border-purple-200 focus:border-purple-400 text-black"
                   readonly
                 />
               </div>
             </div>
 
             <div class="space-y-2">
-              <Label for="email">Email</Label>
+              <Label for="email" class="text-black">Email</Label>
               <div class="relative">
                 <Mail class="w-4 h-4 absolute left-3 top-3 text-purple-500" />
                 <Input
                   id="email"
                   type="email"
                   :value="userInfo.correo"
-                  class="pl-10 border-purple-200 focus:border-purple-400"
+                  class="pl-10 border-purple-200 focus:border-purple-400 text-black"
                   readonly
                 />
               </div>
             </div>
 
             <div class="space-y-2">
-              <Label for="phone">Teléfono</Label>
+              <Label for="phone" class="text-black">Teléfono</Label>
               <div class="relative">
                 <Phone class="w-4 h-4 absolute left-3 top-3 text-purple-500" />
                 <Input
                   id="phone"
                   :value="userInfo.telefono || 'No especificado'"
-                  class="pl-10 border-purple-200 focus:border-purple-400"
+                  class="pl-10 border-purple-200 focus:border-purple-400 text-black"
                   readonly
                 />
               </div>
             </div>
 
             <div class="space-y-2">
-              <Label for="address">Dirección</Label>
+              <Label for="address" class="text-black">Dirección</Label>
               <div class="relative">
                 <MapPin class="w-4 h-4 absolute left-3 top-3 text-purple-500" />
                 <Input
                   id="address"
                   :value="userInfo.direccion || 'No especificada'"
-                  class="pl-10 border-purple-200 focus:border-purple-400"
+                  class="pl-10 border-purple-200 focus:border-purple-400 text-black"
                   readonly
                 />
               </div>

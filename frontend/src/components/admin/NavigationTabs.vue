@@ -1,16 +1,16 @@
 <template>
-  <div class="w-full bg-gradient-to-r from-blue-50 to-green-50 border-b border-blue-100 py-4">
-    <div class="max-w-4xl mx-auto">
-      <div class="flex justify-center gap-8">
+  <div class="w-full bg-[hsl(var(--nav-background))] border-b border-gray-200 py-4">
+    <div class="max-w-6xl mx-auto">
+      <div class="flex justify-end gap-6 px-4">
         <button
           v-for="tab in tabs"
           :key="tab.id"
           @click="$emit('tab-change', tab.id)"
           :class="[
-            'flex flex-col items-center gap-2 p-6 rounded-lg h-auto transition-all duration-200',
+            'flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200',
             activeTab === tab.id
-              ? 'bg-blue-500 hover:bg-blue-600 text-white shadow-lg'
-              : 'text-blue-700 hover:bg-blue-100 hover:text-blue-800'
+              ? 'bg-blue-500 hover:bg-blue-600 text-white'
+              : 'text-gray-600 hover:bg-gray-100'
           ]"
         >
           <component :is="tab.icon" class="w-8 h-8" />

@@ -39,7 +39,9 @@ const buttonVariants = cva(
       variant: {
         default: 'bg-primary text-primary-foreground hover:bg-primary/90',
         destructive: 'bg-destructive text-destructive-foreground hover:bg-destructive/90',
-        outline: 'border border-input bg-background hover:bg-accent hover:text-accent-foreground',
+  // Make outline buttons explicit about background and text so they don't inherit the Card's text color
+  // Use a light border, white background, dark text and a subtle hover to match the desired design inside cards
+  outline: 'border border-gray-200 bg-white text-slate-800 shadow-sm hover:bg-gray-50 hover:text-slate-900',
         secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
         ghost: 'hover:bg-accent hover:text-accent-foreground',
         link: 'text-primary underline-offset-4 hover:underline',

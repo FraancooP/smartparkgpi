@@ -1,0 +1,93 @@
+<script setup>
+import { ref, onMounted } from 'vue'
+import { Car, TrendingUp, DollarSign, Users, ChevronLeft, Edit2, Trash2 } from 'lucide-vue-next'
+import Card from '../ui/Card.vue'
+import CardHeader from '../ui/CardHeader.vue'
+import CardTitle from '../ui/CardTitle.vue'
+import CardContent from '../ui/CardContent.vue'
+import Button from '../ui/Button.vue'
+import Tabs from '../ui/Tabs.vue'
+import TabsList from '../ui/TabsList.vue'
+import TabsTrigger from '../ui/TabsTrigger.vue'
+import TabsContent from '../ui/TabsContent.vue'
+import LineChart from '../ui/LineChart.vue'
+import BarChart from '../ui/BarChart.vue'
+import PieChart from '../ui/PieChart.vue'
+
+import EditParkingInfoDialog from './EditParkingInfoDialog.vue'
+import ManageEmployeesDialog from './ManageEmployeesDialog.vue'
+import ManageSpacesDialog from './ManageSpacesDialog.vue'
+import DeleteParkingDialog from './DeleteParkingDialog.vue'
+
+const parking = ref({
+  id: '1',
+  name: 'Garaje Subterráneo Plaza',
+  image: '/parking-image.jpg',
+  location: 'Av. Santa Fe 5678, CABA',
+  spaces: 85,
+  occupiedSpaces: 67,
+  employees: 4,
+  revenue: 67000,
+})
+
+const weeklyOccupancyData = ref({
+  labels: ['Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab', 'Dom'],
+  datasets: [{
+    label: 'Ocupación',
+    data: [65, 80, 75, 90, 95, 40, 35],
+    backgroundColor: '#3b82f6',
+  }]
+})
+
+const occupancyTypeData = ref({
+  labels: ['Autos', 'Motos'],
+  datasets: [{
+    data: [70, 30],
+    backgroundColor: ['#3b82f6', '#22c55e'],
+  }]
+})
+
+const monthlyRevenueData = ref({
+  labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'],
+  datasets: [{
+    label: 'Ingresos Mensuales',
+    data: [45000, 48000, 52000, 49000, 67000, 65000],
+    borderColor: '#8b5cf6',
+    tension: 0.3,
+    fill: false
+  }]
+})
+
+const showEditDialog = ref(false)
+const showEmployeesDialog = ref(false)
+const showSpacesDialog = ref(false)
+const showDeleteDialog = ref(false)
+
+const hourlyOccupancy = ref([])
+const dailyRevenue = ref([])
+
+onMounted(() => {
+  hourlyOccupancy.value = [
+    { hour: '08:00', value: 10 },
+    { hour: '09:00', value: 15 },
+    { hour: '10:00', value: 20 },
+    { hour: '11:00', value: 25 },
+    { hour: '12:00', value: 30 },
+  ]
+
+  dailyRevenue.value = [
+    { day: 'Lunes', value: 5000 },
+    { day: 'Martes', value: 6000 },
+    { day: 'Miércoles', value: 5500 },
+    { day: 'Jueves', value: 7000 },
+    { day: 'Viernes', value: 8000 },
+  ]
+})
+
+function formatCurrency(value) {
+  return new Intl.NumberFormat('es-AR', {
+    style: 'currency',
+    currency: 'ARS'
+  }).format(value)
+}
+</script>

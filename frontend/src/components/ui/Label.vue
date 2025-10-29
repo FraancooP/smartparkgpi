@@ -21,7 +21,7 @@ const props = defineProps({
 
 const labelClass = computed(() => {
   return cn(
-    'text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70',
+    'text-sm font-medium leading-none text-gray-700 peer-disabled:cursor-not-allowed peer-disabled:opacity-70',
     props.class
   )
 })

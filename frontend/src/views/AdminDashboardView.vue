@@ -5,20 +5,26 @@
 
     <!-- Contenido Principal -->
     <main class="relative">
-      <!-- Vista de Perfil -->
-      <ProfileView v-if="activeTab === 'profile'" />
+      <!-- If a nested child route is active (parking detail, profile, settings, register), render it -->
+      <router-view v-if="isChildActive" />
 
-      <!-- Vista de Estacionamientos -->
-      <div v-else-if="activeTab === 'parking'">
-        <ParkingDashboard
-          :parkings="parkings"
-          @register-click="showRegistrationForm = true"
-          @parking-click="handleParkingClick"
-        />
-      </div>
+      <!-- Otherwise, render the internal tab views -->
+      <template v-else>
+        <!-- Vista de Perfil -->
+        <ProfileView v-if="activeTab === 'profile'" />
 
-      <!-- Vista de Configuración -->
-      <SettingsView v-else-if="activeTab === 'settings'" />
+        <!-- Vista de Estacionamientos -->
+        <div v-else-if="activeTab === 'parking'">
+          <ParkingDashboard
+            :parkings="parkings"
+            @register-click="showRegistrationForm = true"
+            @parking-click="handleParkingClick"
+          />
+        </div>
+
+        <!-- Vista de Configuración -->
+        <SettingsView v-else-if="activeTab === 'settings'" />
+      </template>
     </main>
 
     <!-- Modal de Registro de Estacionamiento -->
@@ -38,7 +44,8 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import NavigationTabs from '@/components/admin/NavigationTabs.vue'
 import ParkingDashboard from '@/components/admin/ParkingDashboard.vue'
 import ParkingRegistrationForm from '@/components/admin/ParkingRegistrationForm.vue'
@@ -48,9 +55,44 @@ import SettingsView from '@/components/admin/SettingsView.vue'
 const activeTab = ref('parking')
 const showRegistrationForm = ref(false)
 const selectedParking = ref(null)
+
+const route = useRoute()
+const router = useRouter()
+
+// When the router has an active child route under /admin/dashboard we want
+// to render the child component (parking detail, profile, settings, register-parking)
+const isChildActive = computed(() => {
+  const name = route.name
+  return (
+    name === 'parking-detail' ||
+    name === 'admin-profile' ||
+    name === 'admin-settings' ||
+    name === 'register-parking'
+  )
+})
+
+// Datos de prueba
 const parkings = ref([
-  // Los estacionamientos se cargarán desde el backend
-  // Por ahora está vacío para que el admin registre el primero
+  {
+    id: '1',
+    name: 'Estacionamiento Central',
+    location: 'Av. Principal 123',
+    image: 'https://images.unsplash.com/photo-1573348722427-f1d6819fdf98?q=80&w=1000&auto=format&fit=crop',
+    spaces: 50,
+    occupiedSpaces: 30,
+    employees: 5,
+    revenue: 150000
+  },
+  {
+    id: '2',
+    name: 'Parking Sur',
+    location: 'Calle Sur 456',
+    image: 'https://images.unsplash.com/photo-1590674899484-d5640e854abe?q=80&w=1000&auto=format&fit=crop',
+    spaces: 35,
+    occupiedSpaces: 20,
+    employees: 3,
+    revenue: 95000
+  }
 ])
 
 const handleTabChange = (tab) => {
@@ -58,10 +100,11 @@ const handleTabChange = (tab) => {
 }
 
 const handleParkingClick = (parking) => {
-  console.log('Parking clickeado:', parking)
-  // Aquí se podría abrir una vista detallada del estacionamiento
-  // Por ahora solo lo logueamos
+  // Navigate to the nested parking detail route so that the child route
+  // (ParkingDetailView) is rendered inside this AdminDashboardView's <router-view>.
+  console.log('Parking clickeado (navegando):', parking)
   selectedParking.value = parking
+  router.push({ name: 'parking-detail', params: { id: parking.id } })
 }
 
 const handleRegistrationSubmit = async (formData) => {
