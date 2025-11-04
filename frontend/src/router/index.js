@@ -82,6 +82,18 @@ const router = createRouter({
       path: '/verify-email',
       name: 'VerifyEmail',
       component: () => import('../views/VerifyEmailView.vue')
+    },
+    // ==================== RUTAS DE EMPLEADO ====================
+    {
+      path: '/employee/login',
+      name: 'employee-login',
+      component: () => import('../views/EmployeeLoginView.vue')
+    },
+    {
+      path: '/employee/dashboard',
+      name: 'employee-dashboard',
+      component: () => import('../views/EmployeeDashboardView.vue'),
+      meta: { requiresAuth: true, role: 'employee' }
     }
   ]
 })
