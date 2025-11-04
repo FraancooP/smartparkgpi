@@ -14,6 +14,7 @@ const Estacionamiento = sequelize.define('Estacionamiento', {
       notEmpty: { msg: 'El nombre del estacionamiento no puede estar vacío' }
     }
   },
+  
   latitud: {
     type: DataTypes.DECIMAL(10, 8),
     allowNull: false,

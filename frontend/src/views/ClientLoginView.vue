@@ -19,7 +19,8 @@ const goBack = () => {
 
 const handleLogin = () => {
   console.log('Client logged in')
-  // Aquí redireccionar al dashboard de cliente
+  // Redireccionar al dashboard de cliente
+  router.push('/client/dashboard')
 }
 
 const handleForgotPassword = () => {

@@ -7,6 +7,7 @@ import AdminDashboardView from '@/views/AdminDashboardView.vue'
 import ClientLoginView from '@/views/ClientLoginView.vue'
 import ClientRegisterView from '@/views/ClientRegisterView.vue'
 import ClientForgotPasswordView from '@/views/ClientForgotPasswordView.vue'
+import ClientDashboardView from '@/views/ClientDashboardView.vue'
 
 const router = createRouter({
   history: createWebHistory('/'),
@@ -77,6 +78,12 @@ const router = createRouter({
       path: '/client/forgot-password',
       name: 'client-forgot-password',
       component: ClientForgotPasswordView
+    },
+    {
+      path: '/client/dashboard',
+      name: 'client-dashboard',
+      component: ClientDashboardView,
+      meta: { requiresAuth: true, role: 'client' }
     },
     {
       path: '/verify-email',
