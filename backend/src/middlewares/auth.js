@@ -120,6 +120,11 @@ const requireRoles = (rolesPermitidos) => {
   };
 };
 
+/**
+ * Alias de requireRoles (nombre alternativo)
+ */
+const verificarRol = requireRoles;
+
 const verificarEmailVerificado = async (req, res, next) => {
   try {
     const usuario = await Usuario.findByPk(req.usuario.id);
@@ -143,5 +148,6 @@ module.exports = {
   soloUsuario, 
   soloEmpleado,
   requireRoles,
+  verificarRol,
   verificarEmailVerificado
 };

@@ -172,19 +172,42 @@ export default {
     },
     async loadDashboardData() {
       try {
-        // Cargar lugares
-        const placesResponse = await getPlaces(this.employee?.estacionamiento_asignado || 1);
-        if (placesResponse.success) {
-          this.parkingSpots = placesResponse.data;
+        // Importar servicios
+        const { getMyParkingAsEmployee, getMyParkingSpots } = await import('@/services/parkingService');
+        
+        // Cargar estacionamiento asignado
+        const parkingResponse = await getMyParkingAsEmployee();
+        console.log('✅ Estacionamiento del empleado:', parkingResponse);
+        
+        if (parkingResponse.estacionamiento) {
+          this.employee = {
+            ...this.employee,
+            estacionamiento: parkingResponse.estacionamiento.nombre,
+            estacionamiento_id: parkingResponse.estacionamiento.id
+          };
+        }
+        
+        // Cargar lugares del estacionamiento
+        if (parkingResponse.lugares) {
+          this.parkingSpots = parkingResponse.lugares.map(lugar => ({
+            id: lugar.id,
+            numero: lugar.numero_lugar,
+            tipo: lugar.tipo,
+            estado: lugar.estado,
+            ocupado_desde: null,
+            reservado_hasta: null
+          }));
         }
 
-        // Cargar reservas pendientes
-        const reservationsResponse = await getPendingReservations();
-        if (reservationsResponse.success) {
-          this.pendingReservations = reservationsResponse.data;
-        }
+        // Por ahora, reservas pendientes vacías (implementar después)
+        this.pendingReservations = [];
+        
       } catch (error) {
-        console.error('Error loading dashboard data:', error);
+        console.error('❌ Error loading dashboard data:', error);
+        // Mostrar mensaje al usuario
+        if (error.response?.status === 404) {
+          alert('No tienes un estacionamiento asignado. Contacta con tu administrador.');
+        }
       }
     },
     startSessionTimer() {

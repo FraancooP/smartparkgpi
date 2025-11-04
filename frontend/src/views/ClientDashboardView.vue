@@ -132,6 +132,16 @@ const handleLocationSelected = (location) => {
   searchedLocation.value = location
   console.log('Ubicación seleccionada:', location)
 }
+
+// Ciclo de vida
+onMounted(() => {
+  loadParkings()
+  setupSocketConnection()
+})
+
+onUnmounted(() => {
+  cleanupSocket()
+})
 </script>
 
 <style>

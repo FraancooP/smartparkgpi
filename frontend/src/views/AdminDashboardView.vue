@@ -44,17 +44,19 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import NavigationTabs from '@/components/admin/NavigationTabs.vue'
 import ParkingDashboard from '@/components/admin/ParkingDashboard.vue'
 import ParkingRegistrationForm from '@/components/admin/ParkingRegistrationForm.vue'
 import ProfileView from '@/components/admin/ProfileView.vue'
 import SettingsView from '@/components/admin/SettingsView.vue'
+import { getMyParkings, createParking } from '@/services/parkingService'
 
 const activeTab = ref('parking')
 const showRegistrationForm = ref(false)
 const selectedParking = ref(null)
+const loadingParkings = ref(false)
 
 const route = useRoute()
 const router = useRouter()
@@ -71,29 +73,49 @@ const isChildActive = computed(() => {
   )
 })
 
-// Datos de prueba
-const parkings = ref([
-  {
-    id: '1',
-    name: 'Estacionamiento Central',
-    location: 'Av. Principal 123',
-    image: 'https://images.unsplash.com/photo-1573348722427-f1d6819fdf98?q=80&w=1000&auto=format&fit=crop',
-    spaces: 50,
-    occupiedSpaces: 30,
-    employees: 5,
-    revenue: 150000
-  },
-  {
-    id: '2',
-    name: 'Parking Sur',
-    location: 'Calle Sur 456',
-    image: 'https://images.unsplash.com/photo-1590674899484-d5640e854abe?q=80&w=1000&auto=format&fit=crop',
-    spaces: 35,
-    occupiedSpaces: 20,
-    employees: 3,
-    revenue: 95000
+// Parkings desde API
+const parkings = ref([])
+
+// Cargar estacionamientos desde backend
+const loadParkings = async () => {
+  try {
+    loadingParkings.value = true
+    const response = await getMyParkings()
+    
+    // Adaptar formato del backend al frontend
+    parkings.value = (response.estacionamientos || []).map(parking => ({
+      id: parking.id.toString(),
+      name: parking.nombre_estacionamiento,
+      location: `Lat: ${parking.latitud}, Lng: ${parking.longitud}`,
+      image: 'https://images.unsplash.com/photo-1573348722427-f1d6819fdf98?q=80&w=1000&auto=format&fit=crop',
+      spaces: parking.lugares?.length || 0,
+      occupiedSpaces: parking.lugares?.filter(l => l.estado === 'ocupado').length || 0,
+      employees: parking.empleado ? 1 : 0,
+      revenue: 0,
+      lat: parking.latitud,
+      lng: parking.longitud,
+      informacion: parking.informacion
+    }))
+    
+  } catch (error) {
+    console.error('Error al cargar estacionamientos:', error)
+    // Si falla, mostrar datos de prueba
+    parkings.value = [
+      {
+        id: '1',
+        name: 'Estacionamiento Central',
+        location: 'Av. Principal 123',
+        image: 'https://images.unsplash.com/photo-1573348722427-f1d6819fdf98?q=80&w=1000&auto=format&fit=crop',
+        spaces: 50,
+        occupiedSpaces: 30,
+        employees: 5,
+        revenue: 150000
+      }
+    ]
+  } finally {
+    loadingParkings.value = false
   }
-])
+}
 
 const handleTabChange = (tab) => {
   activeTab.value = tab
@@ -111,45 +133,33 @@ const handleRegistrationSubmit = async (formData) => {
   try {
     console.log('Datos a enviar al backend:', formData)
 
-    // TODO: Aquí se enviará al backend cuando tengamos el controller
-    // const response = await fetch('http://localhost:4000/api/admin/parkings', {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //     'Authorization': `Bearer ${localStorage.getItem('token')}`
-    //   },
-    //   body: JSON.stringify(formData)
-    // })
-
-    // const data = await response.json()
-
-    // if (response.ok) {
-    //   parkings.value.push(data.estacionamiento)
-    //   alert('¡Estacionamiento registrado exitosamente!')
-    //   showRegistrationForm.value = false
-    // } else {
-    //   alert(data.error || 'Error al registrar el estacionamiento')
-    // }
-
-    // Por ahora solo simulamos el registro
-    const newParking = {
-      id: Date.now().toString(),
-      name: formData.name,
-      image: formData.images[0] || 'https://images.unsplash.com/photo-1558457738-f199ff9dbf82?w=400',
-      location: formData.location,
-      spaces: parseInt(formData.spaces),
-      occupiedSpaces: 0
+    // Preparar datos para el backend
+    const parkingData = {
+      nombre_estacionamiento: formData.name,
+      latitud: formData.coordinates?.lat || -31.4201,
+      longitud: formData.coordinates?.lng || -64.1888,
+      informacion: formData.location || ''
     }
 
-    parkings.value.push(newParking)
+    // Enviar al backend
+    const response = await createParking(parkingData)
     
-    alert(`¡Estacionamiento "${formData.name}" registrado exitosamente!\n\nEmpleados agregados: ${formData.employees.length}\nTarifa Moto: $${formData.rates.moto}\nTarifa Auto: $${formData.rates.auto}`)
+    console.log('Estacionamiento creado:', response)
     
+    // Recargar lista de estacionamientos
+    await loadParkings()
+    
+    alert(`✅ Estacionamiento "${formData.name}" registrado exitosamente!`)
     showRegistrationForm.value = false
 
   } catch (error) {
-    console.error('Error:', error)
-    alert('No se pudo conectar con el servidor')
+    console.error('Error al crear estacionamiento:', error)
+    alert(error.response?.data?.error || 'Error al registrar el estacionamiento')
   }
 }
+
+// Cargar datos al montar
+onMounted(() => {
+  loadParkings()
+})
 </script>

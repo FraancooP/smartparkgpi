@@ -161,12 +161,22 @@ export default {
       }
 
       try {
-        const response = await updatePlaceStatus(spotId, newStatus);
-        if (response.success) {
-          this.$emit('spot-updated', { id: spotId, estado: newStatus });
-        }
+        // Importar servicio de API real
+        const { updateSpotStatusAsEmployee } = await import('@/services/parkingService');
+        
+        // Actualizar estado en el backend
+        const response = await updateSpotStatusAsEmployee(spotId, newStatus);
+        
+        console.log('✅ Lugar actualizado:', response);
+        
+        // Emitir evento para actualizar UI local
+        this.$emit('spot-updated', { id: spotId, estado: newStatus });
+        
+        // Socket.io emitirá automáticamente el evento al cliente
+        
       } catch (error) {
-        console.error('Error updating spot:', error);
+        console.error('❌ Error updating spot:', error);
+        alert(error.response?.data?.error || 'Error al actualizar el lugar');
       }
     },
     resetAllSpots() {

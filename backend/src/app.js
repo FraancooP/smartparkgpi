@@ -3,6 +3,9 @@ const cors = require('cors');
 
 const authRoutes = require('./routes/authRoutes');
 const adminRoutes = require('./routes/adminRoutes');
+const parkingRoutes = require('./routes/parkingRoutes');
+const employeeRoutes = require('./routes/employeeRoutes');
+const clientRoutes = require('./routes/clientRoutes');
 
 const app = express();
 
@@ -11,8 +14,11 @@ app.use(cors());
 app.use(express.json());
 
 // Rutas
-app.use('/api/auth', authRoutes);     // Rutas de autenticación
-app.use('/api/admin', adminRoutes);   // Rutas de administrador
+app.use('/api/auth', authRoutes);        // Rutas de autenticación
+app.use('/api/admin', adminRoutes);      // Rutas de administrador
+app.use('/api/admin', parkingRoutes);    // Rutas de parkings y spots (admin)
+app.use('/api/employee', employeeRoutes); // Rutas de empleado
+app.use('/api/client', clientRoutes);    // Rutas públicas para clientes
 
 
 
