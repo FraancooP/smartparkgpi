@@ -3,99 +3,10 @@
  * Gestión de espacios, reservas y ocupaciones
  */
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-const USE_MOCK_DATA = import.meta.env.VITE_USE_MOCK === 'true' || true;
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000/api';
+const USE_MOCK_DATA = import.meta.env.VITE_USE_MOCK === 'true' || false;
 
-// ==================== DATOS MOCK ====================
-
-const mockEmployees = {
-  'emp001': {
-    id: 1,
-    nombre: 'Carlos Rodríguez',
-    email: 'carlos@smartpark.com',
-    username: 'emp001',
-    password: '123456',
-    rol_id: 3,
-    estacionamiento_asignado: 1
-  },
-  'emp002': {
-    id: 2,
-    nombre: 'María García',
-    email: 'maria@smartpark.com',
-    username: 'emp002',
-    password: '123456',
-    rol_id: 3,
-    estacionamiento_asignado: 1
-  }
-};
-
-const mockLugares = Array.from({ length: 50 }, (_, i) => {
-  const random = Math.random();
-  let estado;
-  
-  if (random < 0.4) estado = 'disponible';
-  else if (random < 0.7) estado = 'ocupado';
-  else estado = 'reservado';
-
-  return {
-    id: i + 1,
-    numero_lugar: `A${(i + 1).toString().padStart(2, '0')}`,
-    tipo: 'estandar',
-    estado: estado,
-    estacionamiento_id: 1,
-    ocupado_desde: estado === 'ocupado' ? new Date(Date.now() - Math.random() * 3600000).toISOString() : null,
-    reservado_hasta: estado === 'reservado' ? new Date(Date.now() + 15 * 60 * 1000).toISOString() : null,
-    creado_en: new Date().toISOString(),
-    actualizado_en: new Date().toISOString()
-  };
-});
-
-const mockReservas = [
-  {
-    id: 1,
-    codigo_numerico: '4567',
-    codigo_qr: 'QR-4567-ABC123',
-    tipo: 'horaria',
-    estado: 'pendiente',
-    fecha: new Date().toISOString().split('T')[0],
-    hora: new Date(Date.now() + 300000).toTimeString().split(' ')[0],
-    tolerancia: 15,
-    usuario_id: 10,
-    lugar_id: null,
-    usuario: { nombre: 'Juan Pérez', email: 'juan@example.com' },
-    vehiculo: { placa: 'ABC-123', modelo: 'Toyota Corolla', color: 'Blanco' }
-  },
-  {
-    id: 2,
-    codigo_numerico: '8901',
-    codigo_qr: 'QR-8901-XYZ789',
-    tipo: 'horaria',
-    estado: 'pendiente',
-    fecha: new Date().toISOString().split('T')[0],
-    hora: new Date(Date.now() + 600000).toTimeString().split(' ')[0],
-    tolerancia: 15,
-    usuario_id: 11,
-    lugar_id: null,
-    usuario: { nombre: 'Ana López', email: 'ana@example.com' },
-    vehiculo: { placa: 'XYZ-789', modelo: 'Honda Civic', color: 'Negro' }
-  },
-  {
-    id: 3,
-    codigo_numerico: '2345',
-    codigo_qr: 'QR-2345-DEF456',
-    tipo: 'horaria',
-    estado: 'pendiente',
-    fecha: new Date().toISOString().split('T')[0],
-    hora: new Date(Date.now() + 900000).toTimeString().split(' ')[0],
-    tolerancia: 15,
-    usuario_id: 12,
-    lugar_id: null,
-    usuario: { nombre: 'Pedro García', email: 'pedro@example.com' },
-    vehiculo: { placa: 'DEF-456', modelo: 'Ford Focus', color: 'Azul' }
-  }
-];
-
-// Helper para simular delay de red
+// Helper para simular delay de red (solo para desarrollo)
 const simulateDelay = (ms = 500) => new Promise(resolve => setTimeout(resolve, ms));
 
 // Helper para respuestas
@@ -105,29 +16,60 @@ const errorResponse = (message) => ({ success: false, error: message });
 // ==================== AUTENTICACIÓN ====================
 
 export const loginEmployee = async (username, password) => {
-  if (USE_MOCK_DATA) {
-    await simulateDelay(800);
-    
-    const employee = mockEmployees[username.toLowerCase()];
-    if (employee && employee.password === password) {
-      const { password: _, ...employeeData } = employee;
-      return successResponse({
-        token: 'mock-jwt-token-' + Date.now(),
-        employee: employeeData
-      });
-    }
-    return errorResponse('Usuario o contraseña incorrectos');
-  }
-
-  // TODO: Implementar llamada real al backend
   try {
-    const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+    const response = await fetch(`${API_BASE_URL}/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, password })
+      body: JSON.stringify({ 
+        usuario: username, 
+        contrasena: password,
+        rol_solicitado: 'empleado'
+      })
     });
-    return await response.json();
+    
+    const data = await response.json();
+    
+    if (!response.ok) {
+      return errorResponse(data.error || 'Error al iniciar sesión');
+    }
+    
+    // Verificar que el usuario tenga rol de empleado
+    if (data.rol_activo !== 'empleado') {
+      return errorResponse('No tienes permisos de empleado');
+    }
+    
+    // Buscar el estacionamiento asignado al empleado usando el endpoint específico
+    const parkingResponse = await fetch(`${API_BASE_URL}/employee/my-parking`, {
+      headers: { 'Authorization': `Bearer ${data.token}` }
+    });
+    
+    if (!parkingResponse.ok) {
+      const errorData = await parkingResponse.json();
+      return errorResponse(errorData.error || 'Error al obtener el estacionamiento asignado');
+    }
+    
+    const parkingData = await parkingResponse.json();
+    
+    // Verificar que tenga un estacionamiento asignado
+    if (!parkingData.estacionamiento) {
+      return errorResponse('No tienes un estacionamiento asignado. Contacta al administrador.');
+    }
+    
+    return successResponse({
+      token: data.token,
+      employee: {
+        id: data.usuario.id,
+        nombre: data.usuario.nombre,
+        apellido: data.usuario.apellido,
+        email: data.usuario.correo,
+        nombre_usuario: data.usuario.nombre_usuario,
+        rol_activo: data.rol_activo,
+        estacionamiento_asignado: parkingData.estacionamiento.id,
+        estacionamiento_nombre: parkingData.estacionamiento.nombre
+      }
+    });
   } catch (error) {
+    console.error('Error en login:', error);
     return errorResponse('Error de conexión con el servidor');
   }
 };
@@ -143,7 +85,7 @@ export const getPlaces = async (estacionamientoId) => {
   try {
     const token = localStorage.getItem('smartpark_employee_token');
     const response = await fetch(
-      `${API_BASE_URL}/api/lugares?estacionamiento_id=${estacionamientoId}`,
+      `${API_BASE_URL}/lugares?estacionamiento_id=${estacionamientoId}`,
       { headers: { 'Authorization': `Bearer ${token}` } }
     );
     return await response.json();
@@ -173,7 +115,7 @@ export const updatePlaceStatus = async (lugarId, nuevoEstado) => {
 
   try {
     const token = localStorage.getItem('smartpark_employee_token');
-    const response = await fetch(`${API_BASE_URL}/api/lugares/${lugarId}/estado`, {
+    const response = await fetch(`${API_BASE_URL}/lugares/${lugarId}/estado`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
@@ -198,7 +140,7 @@ export const getPendingReservations = async () => {
   try {
     const token = localStorage.getItem('smartpark_employee_token');
     const response = await fetch(
-      `${API_BASE_URL}/api/reservas?estado=pendiente`,
+      `${API_BASE_URL}/reservas?estado=pendiente`,
       { headers: { 'Authorization': `Bearer ${token}` } }
     );
     return await response.json();
@@ -223,7 +165,7 @@ export const validateReservation = async (code) => {
 
   try {
     const token = localStorage.getItem('smartpark_employee_token');
-    const response = await fetch(`${API_BASE_URL}/api/reservas/codigo/${code}`, {
+    const response = await fetch(`${API_BASE_URL}/reservas/codigo/${code}`, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
     return await response.json();
@@ -255,7 +197,7 @@ export const assignPlaceToReservation = async (reservaId, lugarId) => {
 
   try {
     const token = localStorage.getItem('smartpark_employee_token');
-    const response = await fetch(`${API_BASE_URL}/api/reservas/${reservaId}/validar`, {
+    const response = await fetch(`${API_BASE_URL}/reservas/${reservaId}/validar`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -288,7 +230,7 @@ export const getDailyStats = async () => {
 
   try {
     const token = localStorage.getItem('smartpark_employee_token');
-    const response = await fetch(`${API_BASE_URL}/api/estadisticas/empleado`, {
+    const response = await fetch(`${API_BASE_URL}/estadisticas/empleado`, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
     return await response.json();

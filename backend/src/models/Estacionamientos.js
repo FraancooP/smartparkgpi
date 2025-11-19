@@ -35,6 +35,51 @@ const Estacionamiento = sequelize.define('Estacionamiento', {
     type: DataTypes.TEXT,
     allowNull: true
   },
+  matricula: {
+    type: DataTypes.STRING(50),
+    allowNull: true,
+    comment: 'Matrícula o código de identificación del estacionamiento'
+  },
+  tarifa_moto: {
+    type: DataTypes.DECIMAL(10, 2),
+    allowNull: true,
+    comment: 'Tarifa por hora para motos (en pesos)'
+  },
+  tarifa_auto: {
+    type: DataTypes.DECIMAL(10, 2),
+    allowNull: true,
+    comment: 'Tarifa por hora para autos (en pesos)'
+  },
+  cantidad_lugares_auto: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    defaultValue: 0,
+    comment: 'Cantidad total de lugares para autos'
+  },
+  cantidad_lugares_moto: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    defaultValue: 0,
+    comment: 'Cantidad total de lugares para motos'
+  },
+  imagen_1: {
+    type: DataTypes.STRING(500),
+    allowNull: true,
+    defaultValue: 'https://images.unsplash.com/photo-1506521781263-d8422e82f27a?w=800',
+    comment: 'URL de la primera imagen del estacionamiento'
+  },
+  imagen_2: {
+    type: DataTypes.STRING(500),
+    allowNull: true,
+    defaultValue: 'https://images.unsplash.com/photo-1590674899484-d5640e854abe?w=800',
+    comment: 'URL de la segunda imagen del estacionamiento'
+  },
+  imagen_3: {
+    type: DataTypes.STRING(500),
+    allowNull: true,
+    defaultValue: 'https://images.unsplash.com/photo-1560179707-f14e90ef3623?w=800',
+    comment: 'URL de la tercera imagen del estacionamiento'
+  },
   //Foranea de admin
   administrador_id: {
     type: DataTypes.INTEGER,

@@ -163,6 +163,8 @@ const formData = ref({
 
 const handleSubmit = async () => {
   try {
+    console.log('🔑 Intentando login de admin...');
+    
     // 1. Hacer la petición HTTP al backend
     const response = await fetch('http://localhost:4000/api/auth/login', {
       method: 'POST',
@@ -170,36 +172,43 @@ const handleSubmit = async () => {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        usuario: formData.value.username, // Campo esperado por el backend
-        contrasena: formData.value.password // Campo esperado por el backend
+        usuario: formData.value.username,
+        contrasena: formData.value.password,
+        rol_solicitado: 'administrador' // Especificar que queremos login como admin
       })
     })
 
     // 2. Procesar la respuesta
     const data = await response.json()
+    console.log('📦 Respuesta del servidor:', data);
 
     if (response.ok) {
       // ✅ ÉXITO - Login exitoso
       
+      // Verificar que el rol activo sea administrador
+      if (data.rol_activo !== 'administrador') {
+        alert('No tienes permisos de administrador');
+        console.error('❌ Rol activo:', data.rol_activo);
+        return;
+      }
+      
       // Guardar el token JWT en localStorage
       localStorage.setItem('token', data.token)
-      localStorage.setItem('user', JSON.stringify(data.usuario))
+      localStorage.setItem('usuario', JSON.stringify(data.usuario))
       
-      // Verificar si es administrador
-      if (data.usuario.rol && data.usuario.rol.rol_administrador) {
-        // Redirigir al dashboard de admin
-        router.push('/admin/dashboard')
-      } else {
-        alert('No tienes permisos de administrador')
-      }
+      console.log('✅ Login exitoso, redirigiendo a dashboard...');
+      
+      // Redirigir al dashboard de admin
+      router.push('/admin/dashboard')
       
     } else {
       // ❌ ERROR del servidor
+      console.error('❌ Error de login:', data.error);
       alert(data.error || 'Credenciales incorrectas')
     }
   } catch (error) {
     // ❌ ERROR de conexión
-    console.error('Error:', error)
+    console.error('❌ Error de conexión:', error)
     alert('No se pudo conectar con el servidor')
   }
 }

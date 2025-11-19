@@ -63,15 +63,6 @@
           {{ isLoading ? 'Iniciando sesión...' : 'Iniciar Sesión' }}
         </button>
       </form>
-
-      <!-- Test Users Info -->
-      <div class="mt-6 p-4 bg-gray-50 rounded-md text-sm">
-        <p class="font-medium text-gray-700 mb-2">Usuarios de prueba:</p>
-        <div class="space-y-1 text-gray-600">
-          <p>• emp001 / 123456</p>
-          <p>• emp002 / 123456</p>
-        </div>
-      </div>
     </div>
   </div>
 </template>
@@ -98,6 +89,8 @@ export default {
         const response = await loginEmployee(this.username, this.password);
         
         if (response.success) {
+          console.log('✅ Login exitoso:', response.data);
+          
           // Guardar token y datos del empleado
           localStorage.setItem('smartpark_employee_token', response.data.token);
           localStorage.setItem('smartpark_employee', JSON.stringify(response.data.employee));
@@ -107,10 +100,11 @@ export default {
           this.$router.push({ name: 'employee-dashboard' });
         } else {
           this.error = response.error || 'Error al iniciar sesión';
+          console.error('❌ Error de login:', response.error);
         }
       } catch (error) {
         this.error = 'Error de conexión. Intente nuevamente.';
-        console.error('Login error:', error);
+        console.error('❌ Error de conexión:', error);
       } finally {
         this.isLoading = false;
       }

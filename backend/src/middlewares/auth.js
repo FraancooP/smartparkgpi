@@ -109,6 +109,8 @@ const requireRoles = (rolesPermitidos) => {
       return res.status(401).json({ error: 'Usuario no autenticado' });
     }
 
+    console.log('🔍 Verificando rol. Permitidos:', rolesPermitidos, 'Activo:', req.usuario.rol_activo);
+
     if (!rolesPermitidos.includes(req.usuario.rol_activo)) {
       return res.status(403).json({ 
         error: `Acceso denegado. Roles permitidos: ${rolesPermitidos.join(', ')}`,

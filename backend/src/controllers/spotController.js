@@ -238,8 +238,21 @@ exports.updateSpotStatus = async (req, res) => {
 
     const estadoAnterior = lugar.estado;
 
-    // Actualizar estado
-    await lugar.update({ estado });
+    // Preparar datos de actualización
+    const updateData = { estado };
+    
+    // Si pasa a ocupado, guardar timestamp
+    if (estado === 'ocupado' && estadoAnterior !== 'ocupado') {
+      updateData.ocupado_desde = new Date();
+    }
+    
+    // Si pasa a disponible, limpiar timestamp
+    if (estado === 'disponible') {
+      updateData.ocupado_desde = null;
+    }
+
+    // Actualizar estado y timestamp
+    await lugar.update(updateData);
 
     // Si pasa de disponible a ocupado, crear registro de ocupación
     if (estadoAnterior === 'disponible' && estado === 'ocupado') {
@@ -267,17 +280,27 @@ exports.updateSpotStatus = async (req, res) => {
 
     // Emitir evento Socket.io para actualizar clientes en tiempo real
     if (req.io) {
-      req.io.emit('spot-updated', {
+      req.io.to(`parking_${lugar.estacionamiento_id}`).emit('spot-updated', {
         lugar_id: lugar.id,
         estacionamiento_id: lugar.estacionamiento_id,
         estado: lugar.estado,
-        numero_lugar: lugar.numero_lugar
+        numero_lugar: lugar.numero_lugar,
+        ocupado_desde: lugar.ocupado_desde,
+        tipo: lugar.tipo
       });
+      console.log(`📡 Socket.io: spot-updated emitido para lugar ${lugar.numero_lugar} (${estado})`);
     }
 
     res.json({
       mensaje: 'Estado actualizado exitosamente',
-      lugar,
+      lugar: {
+        id: lugar.id,
+        numero_lugar: lugar.numero_lugar,
+        tipo: lugar.tipo,
+        estado: lugar.estado,
+        ocupado_desde: lugar.ocupado_desde,
+        estacionamiento_id: lugar.estacionamiento_id
+      },
       cambio: {
         de: estadoAnterior,
         a: estado

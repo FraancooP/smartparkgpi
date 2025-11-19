@@ -29,19 +29,66 @@
       </div>
 
       <!-- Filters -->
-      <div class="mt-4 flex items-center gap-4">
-        <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-        </svg>
-        <select
-          v-model="filter"
-          class="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        >
-          <option value="todos">Todos los espacios</option>
-          <option value="disponible">Solo libres</option>
-          <option value="ocupado">Solo ocupados</option>
-          <option value="reservado">Solo reservados</option>
-        </select>
+      <div class="mt-4 space-y-3">
+        <!-- Filtro de Tipo de Vehículo (Padre) -->
+        <div class="flex items-center gap-4">
+          <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+          <label class="text-sm font-medium text-gray-700">Tipo de vehículo:</label>
+          <div class="flex gap-2">
+            <button
+              @click="vehicleTypeFilter = 'auto'"
+              :class="[
+                'px-4 py-2 rounded-md text-sm font-medium transition-colors',
+                vehicleTypeFilter === 'auto'
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              ]"
+            >
+              🚗 Autos
+            </button>
+            <button
+              @click="vehicleTypeFilter = 'moto'"
+              :class="[
+                'px-4 py-2 rounded-md text-sm font-medium transition-colors',
+                vehicleTypeFilter === 'moto'
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              ]"
+            >
+              🏍️ Motos
+            </button>
+            <button
+              @click="vehicleTypeFilter = 'todos'"
+              :class="[
+                'px-4 py-2 rounded-md text-sm font-medium transition-colors',
+                vehicleTypeFilter === 'todos'
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              ]"
+            >
+              📋 Todos
+            </button>
+          </div>
+        </div>
+
+        <!-- Filtro de Estado (Hijo) -->
+        <div class="flex items-center gap-4">
+          <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+          </svg>
+          <label class="text-sm font-medium text-gray-700">Estado:</label>
+          <select
+            v-model="statusFilter"
+            class="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="todos">Todos los espacios</option>
+            <option value="disponible">Solo libres</option>
+            <option value="ocupado">Solo ocupados</option>
+            <option value="reservado">Solo reservados</option>
+          </select>
+        </div>
       </div>
     </div>
 
@@ -91,14 +138,31 @@ export default {
   },
   data() {
     return {
-      filter: 'todos',
+      vehicleTypeFilter: 'auto', // Por defecto mostrar autos
+      statusFilter: 'todos',
       currentTime: new Date()
     };
   },
   computed: {
     filteredSpots() {
-      if (this.filter === 'todos') return this.spots;
-      return this.spots.filter(spot => spot.estado === this.filter);
+      let filtered = this.spots;
+      
+      // Filtrar por tipo de vehículo
+      if (this.vehicleTypeFilter === 'auto') {
+        // Lugares de auto: tipo 'estandar', 'discapacitado', 'electrico' (todos menos 'moto')
+        filtered = filtered.filter(spot => spot.tipo !== 'moto');
+      } else if (this.vehicleTypeFilter === 'moto') {
+        // Lugares de moto: tipo 'moto'
+        filtered = filtered.filter(spot => spot.tipo === 'moto');
+      }
+      // Si es 'todos', no filtramos por tipo
+      
+      // Filtrar por estado
+      if (this.statusFilter !== 'todos') {
+        filtered = filtered.filter(spot => spot.estado === this.statusFilter);
+      }
+      
+      return filtered;
     },
     statusCounts() {
       return {

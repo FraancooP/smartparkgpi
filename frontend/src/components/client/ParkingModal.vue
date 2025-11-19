@@ -44,22 +44,37 @@
         <div class="space-y-3">
           <h2 class="text-xl font-bold text-slate-800">{{ parking.name }}</h2>
           
-          <div class="flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-              <div 
-                class="w-4 h-4 rounded-full"
-                :class="getColorClass(parking.color)"
-              />
-              <span class="text-sm text-slate-600">
-                {{ parking.availableSpots }} de {{ parking.totalSpots }} lugares disponibles
+          <div class="space-y-2">
+            <!-- Disponibilidad total -->
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-3">
+                <div 
+                  class="w-4 h-4 rounded-full"
+                  :class="getColorClass(parking.color)"
+                />
+                <span class="text-sm text-slate-600">
+                  {{ parking.availableSpots }} de {{ parking.totalSpots }} lugares disponibles
+                </span>
+              </div>
+              <span 
+                class="px-3 py-1 rounded-full text-xs font-semibold"
+                :class="getBadgeClass(parking.color)"
+              >
+                {{ getAvailabilityText(parking.color) }}
               </span>
             </div>
-            <span 
-              class="px-3 py-1 rounded-full text-xs font-semibold"
-              :class="getBadgeClass(parking.color)"
-            >
-              {{ getAvailabilityText(parking.color) }}
-            </span>
+            
+            <!-- Desglose por tipo de vehículo -->
+            <div v-if="parking.cantidad_lugares_auto || parking.cantidad_lugares_moto" class="flex items-center gap-4 text-xs text-slate-500 pl-7">
+              <div v-if="parking.cantidad_lugares_auto" class="flex items-center gap-1">
+                <span>🚗</span>
+                <span>{{ getDisponiblesAuto(parking) }}/{{ parking.cantidad_lugares_auto }} autos</span>
+              </div>
+              <div v-if="parking.cantidad_lugares_moto" class="flex items-center gap-1">
+                <span>🏍️</span>
+                <span>{{ getDisponiblesMotos(parking) }}/{{ parking.cantidad_lugares_moto }} motos</span>
+              </div>
+            </div>
           </div>
         </div>
         
@@ -157,6 +172,22 @@ const getAvailabilityText = (color) => {
     yellow: 'Casi lleno',
     green: 'Disponible'
   }[color]
+}
+
+const getDisponiblesAuto = (parking) => {
+  // Si no tenemos datos separados, calcular proporcionalmente
+  if (!parking.cantidad_lugares_auto) return 0
+  
+  const porcentajeDisponibles = parking.availableSpots / parking.totalSpots
+  return Math.floor(parking.cantidad_lugares_auto * porcentajeDisponibles)
+}
+
+const getDisponiblesMotos = (parking) => {
+  // Si no tenemos datos separados, calcular proporcionalmente
+  if (!parking.cantidad_lugares_moto) return 0
+  
+  const porcentajeDisponibles = parking.availableSpots / parking.totalSpots
+  return Math.floor(parking.cantidad_lugares_moto * porcentajeDisponibles)
 }
 
 const handleReserveNow = () => {

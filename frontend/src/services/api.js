@@ -14,9 +14,28 @@ const apiClient = axios.create({
 // Interceptor para agregar token JWT automáticamente
 apiClient.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token')
+    let token = null;
+    
+    // Determinar qué token usar según la ruta
+    if (config.url.startsWith('/employee/')) {
+      // Para rutas de empleado, usar solo token de empleado
+      token = localStorage.getItem('smartpark_employee_token');
+      console.log('🔑 [EMPLOYEE] Usando token de empleado');
+    } else if (config.url.startsWith('/admin/')) {
+      // Para rutas de admin, usar token general
+      token = localStorage.getItem('token');
+      console.log('🔑 [ADMIN] Usando token de admin');
+    } else {
+      // Para otras rutas (client, auth), intentar token general primero
+      token = localStorage.getItem('token') || localStorage.getItem('smartpark_employee_token');
+      console.log('🔑 [GENERAL] Usando token disponible');
+    }
+    
     if (token) {
-      config.headers.Authorization = `Bearer ${token}`
+      config.headers.Authorization = `Bearer ${token}`;
+      console.log('🔑 Token encontrado:', token.substring(0, 20) + '...');
+    } else {
+      console.log('⚠️ No hay token para enviar');
     }
     return config
   },

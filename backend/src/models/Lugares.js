@@ -30,6 +30,11 @@ const Lugar = sequelize.define('Lugar', {
   numero_lugar: {
     type: DataTypes.STRING(10),
     allowNull: false
+  },
+  ocupado_desde: {
+    type: DataTypes.DATE,
+    allowNull: true,
+    comment: 'Timestamp cuando el lugar fue ocupado'
   }
 }, {
   tableName: 'lugares',

@@ -79,6 +79,21 @@ class SocketService {
     }
   }
 
+  // Escuchar evento de creación de estacionamiento
+  onParkingCreated(callback) {
+    if (this.socket) {
+      this.socket.on('parking-created', callback)
+      console.log('👂 Escuchando evento: parking-created')
+    }
+  }
+
+  // Dejar de escuchar evento de creación de estacionamiento
+  offParkingCreated(callback) {
+    if (this.socket) {
+      this.socket.off('parking-created', callback)
+    }
+  }
+
   // Obtener instancia del socket
   getSocket() {
     return this.socket

@@ -35,8 +35,8 @@
     >
       <div class="w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-white rounded-lg shadow-2xl">
         <ParkingRegistrationForm
-          @submit="handleRegistrationSubmit"
           @cancel="showRegistrationForm = false"
+          @success="handleRegistrationSuccess"
         />
       </div>
     </div>
@@ -129,33 +129,12 @@ const handleParkingClick = (parking) => {
   router.push({ name: 'parking-detail', params: { id: parking.id } })
 }
 
-const handleRegistrationSubmit = async (formData) => {
-  try {
-    console.log('Datos a enviar al backend:', formData)
-
-    // Preparar datos para el backend
-    const parkingData = {
-      nombre_estacionamiento: formData.name,
-      latitud: formData.coordinates?.lat || -31.4201,
-      longitud: formData.coordinates?.lng || -64.1888,
-      informacion: formData.location || ''
-    }
-
-    // Enviar al backend
-    const response = await createParking(parkingData)
-    
-    console.log('Estacionamiento creado:', response)
-    
-    // Recargar lista de estacionamientos
-    await loadParkings()
-    
-    alert(`✅ Estacionamiento "${formData.name}" registrado exitosamente!`)
-    showRegistrationForm.value = false
-
-  } catch (error) {
-    console.error('Error al crear estacionamiento:', error)
-    alert(error.response?.data?.error || 'Error al registrar el estacionamiento')
-  }
+const handleRegistrationSuccess = async () => {
+  // Cerrar modal
+  showRegistrationForm.value = false
+  
+  // Recargar estacionamientos
+  await loadParkings()
 }
 
 // Cargar datos al montar

@@ -105,4 +105,82 @@ const router = createRouter({
   ]
 })
 
+// ==================== NAVIGATION GUARDS ====================
+
+router.beforeEach((to, from, next) => {
+  const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
+  const requiredRole = to.meta.role;
+
+  if (requiresAuth) {
+    let isAuthenticated = false;
+    let userRole = null;
+    let token = null;
+
+    // Verificar según el rol requerido
+    if (requiredRole === 'admin') {
+      token = localStorage.getItem('token');
+      const usuario = localStorage.getItem('usuario');
+      if (token && usuario) {
+        const userData = JSON.parse(usuario);
+        isAuthenticated = true;
+        // Verificar que sea admin (rol_activo o rol.rol_administrador)
+        userRole = userData.rol_activo || (userData.rol?.rol_administrador ? 'administrador' : null);
+      }
+    } else if (requiredRole === 'client') {
+      token = localStorage.getItem('token');
+      const usuario = localStorage.getItem('usuario');
+      if (token && usuario) {
+        const userData = JSON.parse(usuario);
+        isAuthenticated = true;
+        // Verificar que sea cliente (rol_activo o rol.rol_usuario)
+        userRole = userData.rol_activo || (userData.rol?.rol_usuario ? 'usuario' : null);
+      }
+    } else if (requiredRole === 'employee') {
+      token = localStorage.getItem('smartpark_employee_token');
+      const employee = localStorage.getItem('smartpark_employee');
+      if (token && employee) {
+        isAuthenticated = true;
+        userRole = 'empleado';
+      }
+    }
+
+    // Si no está autenticado, redirigir al login correspondiente
+    if (!isAuthenticated) {
+      if (requiredRole === 'admin') {
+        next({ name: 'admin-login' });
+      } else if (requiredRole === 'client') {
+        next({ name: 'client-login' });
+      } else if (requiredRole === 'employee') {
+        next({ name: 'employee-login' });
+      } else {
+        next({ name: 'home' });
+      }
+      return;
+    }
+
+    // Verificar que el rol coincida
+    const validRoles = {
+      'admin': ['administrador', 'admin'],
+      'client': ['usuario', 'client'],
+      'employee': ['empleado', 'employee']
+    };
+
+    if (validRoles[requiredRole] && !validRoles[requiredRole].includes(userRole)) {
+      // Rol incorrecto, redirigir a su dashboard correspondiente
+      if (userRole === 'administrador' || userRole === 'admin') {
+        next({ name: 'admin-dashboard' });
+      } else if (userRole === 'usuario' || userRole === 'client') {
+        next({ name: 'client-dashboard' });
+      } else if (userRole === 'empleado' || userRole === 'employee') {
+        next({ name: 'employee-dashboard' });
+      } else {
+        next({ name: 'home' });
+      }
+      return;
+    }
+  }
+
+  next(); // Continuar con la navegación
+});
+
 export default router

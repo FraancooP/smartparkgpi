@@ -150,7 +150,7 @@ import CardContent from '@/components/ui/CardContent.vue'
 import Checkbox from '@/components/ui/Checkbox.vue'
 import { Eye, EyeOff, ArrowLeft, Users } from 'lucide-vue-next'
 
-defineEmits(['back', 'login', 'forgotPassword', 'register'])
+const emit = defineEmits(['back', 'login', 'forgotPassword', 'register'])
 
 const showPassword = ref(false)
 const rememberMe = ref(false)
@@ -161,6 +161,8 @@ const formData = ref({
 
 const handleSubmit = async () => {
   try {
+    console.log('🔑 Intentando login de cliente...');
+    
     // 1. Hacer la petición HTTP al backend
     const response = await fetch('http://localhost:4000/api/auth/login', {
       method: 'POST',
@@ -168,33 +170,45 @@ const handleSubmit = async () => {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        usuario: formData.value.username, // Campo esperado por el backend
-        contrasena: formData.value.password // Campo esperado por el backend
+        usuario: formData.value.username,
+        contrasena: formData.value.password,
+        rol_solicitado: 'usuario' // Especificar que queremos login como cliente
       })
     })
 
     // 2. Procesar la respuesta
     const data = await response.json()
+    console.log('📦 Respuesta del servidor:', data);
 
     if (response.ok) {
-      //ÉXITO - Login exitoso
+      // ✅ ÉXITO - Login exitoso
+      
+      // Verificar que el rol activo sea usuario/cliente
+      if (data.rol_activo !== 'usuario') {
+        alert('No tienes permisos de cliente');
+        console.error('❌ Rol activo:', data.rol_activo);
+        return;
+      }
       
       // Guardar el token JWT en localStorage
       localStorage.setItem('token', data.token)
-      localStorage.setItem('user', JSON.stringify(data.usuario))
+      localStorage.setItem('usuario', JSON.stringify(data.usuario))
+      
+      console.log('✅ Login exitoso');
       
       alert(`¡Bienvenido ${data.usuario.nombre}!`)
       
-      // Redirigir al dashboard del usuario
-      // this.$router.push('/dashboard')
+      // Emitir evento para que el padre redirija
+      emit('login')
       
     } else {
-      // ERROR del servidor
+      // ❌ ERROR del servidor
+      console.error('❌ Error de login:', data.error);
       alert(data.error || 'Credenciales incorrectas')
     }
   } catch (error) {
-    // ERROR de conexión
-    console.error('Error:', error)
+    // ❌ ERROR de conexión
+    console.error('❌ Error de conexión:', error)
     alert('No se pudo conectar con el servidor')
   }
 }

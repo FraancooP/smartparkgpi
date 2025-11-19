@@ -225,134 +225,94 @@ import ManageEmployeesDialog from './ManageEmployeesDialog.vue'
 import ManageSpacesDialog from './ManageSpacesDialog.vue'
 import DeleteParkingDialog from './DeleteParkingDialog.vue'
 
-export default {
-  name: 'ParkingDetailView',
-  
-  components: {
-    Card,
-    CardHeader,
-    CardTitle,
-    CardContent,
-    Button,
-    Tabs,
-    TabsList,
-    TabsTrigger,
-    TabsContent,
-    LineChart,
-    BarChart,
-    PieChart,
-    EditParkingInfoDialog,
-    ManageEmployeesDialog,
-    ManageSpacesDialog,
-    DeleteParkingDialog,
-  },
+const parking = ref({
+  id: '1',
+  name: 'Estacionamiento Centro',
+  image: '/parking-image.jpg',
+  location: 'Av. Corrientes 1234, CABA',
+  spaces: 120,
+  occupiedSpaces: 98,
+  employees: 4,
+  revenue: 67000,
+});
 
-  setup() {
-    const parking = ref({
-      id: '1',
-      name: 'Estacionamiento Centro',
-      image: '/parking-image.jpg',
-      location: 'Av. Corrientes 1234, CABA',
-      spaces: 120,
-      occupiedSpaces: 98,
-      employees: 4,
-      revenue: 67000,
-    });
+const weeklyOccupancyData = ref({
+  labels: ['Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab', 'Dom'],
+  datasets: [
+    {
+      label: 'Ocupación',
+      data: [65, 80, 75, 90, 95, 40, 35],
+      backgroundColor: '#3b82f6',
+    }
+  ]
+});
 
-    const weeklyOccupancyData = ref({
-      labels: ['Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab', 'Dom'],
-      datasets: [
-        {
-          label: 'Ocupación',
-          data: [65, 80, 75, 90, 95, 40, 35],
-          backgroundColor: '#3b82f6',
-        }
-      ]
-    });
+const occupancyTypeData = ref({
+  labels: ['Autos', 'Motos'],
+  datasets: [
+    {
+      data: [70, 30],
+      backgroundColor: ['#3b82f6', '#22c55e'],
+    }
+  ]
+});
 
-    const occupancyTypeData = ref({
-      labels: ['Autos', 'Motos'],
-      datasets: [
-        {
-          data: [70, 30],
-          backgroundColor: ['#3b82f6', '#22c55e'],
-        }
-      ]
-    });
+const monthlyRevenueData = ref({
+  labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'],
+  datasets: [
+    {
+      label: 'Ingresos Mensuales',
+      data: [45000, 48000, 52000, 49000, 67000, 65000],
+      borderColor: '#8b5cf6',
+      tension: 0.3,
+      fill: false
+    }
+  ]
+});
 
-    const monthlyRevenueData = ref({
-      labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'],
-      datasets: [
-        {
-          label: 'Ingresos Mensuales',
-          data: [45000, 48000, 52000, 49000, 67000, 65000],
-          borderColor: '#8b5cf6',
-          tension: 0.3,
-          fill: false
-        }
-      ]
-    });
+const showEditDialog = ref(false);
+const showEmployeesDialog = ref(false);
+const showSpacesDialog = ref(false);
+const showDeleteDialog = ref(false);
 
-    const showEditDialog = ref(false);
-    const showEmployeesDialog = ref(false);
-    const showSpacesDialog = ref(false);
-    const showDeleteDialog = ref(false);
-    
-    const hourlyOccupancy = ref([]);
-    const dailyRevenue = ref([]);
+const hourlyOccupancy = ref([]);
+const dailyRevenue = ref([]);
 
-    onMounted(() => {
-      hourlyOccupancy.value = [
-        { hour: '08:00', value: 10 },
-        { hour: '09:00', value: 15 },
-        { hour: '10:00', value: 20 },
-        { hour: '11:00', value: 25 },
-        { hour: '12:00', value: 30 },
-      ];
+onMounted(() => {
+  hourlyOccupancy.value = [
+    { hour: '08:00', value: 10 },
+    { hour: '09:00', value: 15 },
+    { hour: '10:00', value: 20 },
+    { hour: '11:00', value: 25 },
+    { hour: '12:00', value: 30 },
+  ];
 
-      dailyRevenue.value = [
-        { day: 'Lunes', value: 5000 },
-        { day: 'Martes', value: 6000 },
-        { day: 'Miércoles', value: 4500 },
-        { day: 'Jueves', value: 7000 },
-        { day: 'Viernes', value: 8000 },
-      ];
-    });
+  dailyRevenue.value = [
+    { day: 'Lunes', value: 5000 },
+    { day: 'Martes', value: 6000 },
+    { day: 'Miércoles', value: 4500 },
+    { day: 'Jueves', value: 7000 },
+    { day: 'Viernes', value: 8000 },
+  ];
+});
 
-    const updateParking = (updatedData) => {
-      Object.assign(parking.value, updatedData);
-      showEditDialog.value = false;
-    };
-
-    const deleteParking = () => {
-      showDeleteDialog.value = false;
-      // Implementar redirección o eliminación aquí
-    };
-
-    const formatCurrency = (value) => {
-      return new Intl.NumberFormat('es-AR', {
-        style: 'currency',
-        currency: 'ARS'
-      }).format(value);
-    };
-
-    return {
-      parking,
-      weeklyOccupancyData,
-      occupancyTypeData,
-      monthlyRevenueData,
-      showEditDialog,
-      showEmployeesDialog,
-      showSpacesDialog,
-      showDeleteDialog,
-      updateParking,
-      deleteParking,
-      formatCurrency,
-      hourlyOccupancy,
-      dailyRevenue,
-    };
-  },
+const updateParking = (updatedData) => {
+  Object.assign(parking.value, updatedData);
+  showEditDialog.value = false;
 };
+
+const deleteParking = () => {
+  showDeleteDialog.value = false;
+  // Implementar redirección o eliminación aquí
+};
+
+const formatCurrency = (value) => {
+  return new Intl.NumberFormat('es-AR', {
+    style: 'currency',
+    currency: 'ARS'
+  }).format(value);
+};
+
 </script>
 
 <style scoped>

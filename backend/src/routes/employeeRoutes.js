@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const spotController = require('../controllers/spotController');
+const parkingController = require('../controllers/parkingController');
 const { verificarToken, verificarRol } = require('../middlewares/auth');
 
 // ============================================
@@ -12,7 +13,7 @@ router.get(
   '/my-parking',
   verificarToken,
   verificarRol(['empleado']),
-  spotController.getMyParkingAsEmployee
+  parkingController.getMyParkingAsEmployee
 );
 
 // Obtener lugares del estacionamiento asignado
